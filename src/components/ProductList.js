@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react'
 import ProductCard from './ProductCard'
 import SearchBox from './SearchBox';
 import CategoryDropdown from './CategoryDropdown';
-
+import {Link} from 'react-router-dom';
 
 export default function ProductList() {
   const [query, setQuery] = useState('');
@@ -78,7 +78,6 @@ React.useEffect(() => {
       if (entries[0].isIntersecting && !loadingMore && !loading) {
         const nextPage = page + 1;
         const skip = nextPage * 12;
-        // only request next page if we know there's more to fetch
         if (total > 0 && skip < total) {
           setPage(nextPage);
         }
@@ -101,7 +100,29 @@ React.useEffect(() => {
         <CategoryDropdown categories={categories} value={category} onChange={setCategory} />
       </div>
       
-      {loading && <div className="text-center my-5"><span className="spinner-border" /> Loading products...</div>}
+      {loading && (
+        <div className="row">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="col-12 col-md-6 col-lg-3 mb-4 d-flex justify-content-center">
+              <div className="card" style={{ width: '18rem' }} aria-hidden="true">
+                <div className="placeholder-wave">
+                  <div style={{ height: '200px', backgroundColor: '#e9ecef' }} className="card-img-top placeholder" />
+                </div>
+                <div className="card-body">
+                  <h5 className="card-title placeholder-glow">
+                    <span className="placeholder col-7" />
+                  </h5>
+                  <p className="card-text placeholder-glow">
+                    <span className="placeholder col-10" />
+                    <span className="placeholder col-8 mt-2 d-block" />
+                  </p>
+                  <Link className="btn btn-primary disabled placeholder col-6" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {!loading && (
         <div className="row">
@@ -111,6 +132,23 @@ React.useEffect(() => {
               className="col-12 col-md-6 col-lg-3 mb-4 d-flex justify-content-center"
             >
               <ProductCard product={product} />
+            </div>
+          ))}
+          {loadingMore && Array.from({ length: 4 }).map((_, i) => (
+            <div key={`loading-more-${i}`} className="col-12 col-md-6 col-lg-3 mb-4 d-flex justify-content-center">
+              <div className="card" style={{ width: '18rem' }} aria-hidden="true">
+                <div className="placeholder-wave">
+                  <div style={{ height: '200px', backgroundColor: '#e9ecef' }} className="card-img-top placeholder" />
+                </div>
+                <div className="card-body">
+                  <h5 className="card-title placeholder-glow">
+                    <span className="placeholder col-7" />
+                  </h5>
+                  <p className="card-text placeholder-glow">
+                    <span className="placeholder col-10" />
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -125,6 +163,9 @@ React.useEffect(() => {
         )}
         {!loading && !loadingMore && filtered.length === 0 && (
           <p className="text-muted">No products found</p>
+        )}
+        {!loading && !loadingMore && products.length > 0 && products.length >= total && (
+          <p className="text-muted">End of results</p>
         )}
       </div>
     </div>
