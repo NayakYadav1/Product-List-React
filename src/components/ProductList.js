@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import ProductCard from './ProductCard'
+import SearchBox from './SearchBox';
+import CategoryDropdown from './CategoryDropdown';
 
-export default function ProductList() {
-  const products = [
+const products = [
     {
       id: 1,
       title: "Wireless Headphones",
@@ -53,12 +54,35 @@ export default function ProductList() {
     }
   ]
 
+export default function ProductList() {
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('');
+
+  const categories = useMemo(() => {
+    const set = new Set(products.map(p => p.category));
+    return Array.from(set);
+  }, []);
+
+  const filtered = products.filter(p => {
+    const matchesQuery =
+      query === '' ||
+      p.title.toLowerCase().includes(query.toLowerCase()) ||
+      p.description.toLowerCase().includes(query.toLowerCase());
+    const matchesCategory = category === '' || p.category === category;
+    return matchesQuery && matchesCategory;
+  });
+
   return (
     <div className="container my-5">
       <h1 className="mb-4">Our Products</h1>
+
+      <div className="d-flex mb-3">
+        <SearchBox value={query} onChange={setQuery} />
+        <CategoryDropdown categories={categories} value={category} onChange={setCategory} />
+      </div>
       
       <div className="row">
-        {products.map((product) => (
+        {filtered.map((product) => (
           <div 
             key={product.id} 
             className="col-12 col-md-6 col-lg-3 mb-4 d-flex justify-content-center"
